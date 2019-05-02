@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 # Setting this, so the repo does not need to be given on the commandline:
-export BORG_REPO=/path-to-your-repo
+export BORG_REPO=/home/art/backup1
+#export BORG_REPO=/path-to-your-repo
 
 # Setting this, so you won't be asked for your repository passphrase:
-#export BORG_PASSPHRASE='XYZl0ngandsecurepa_55_phrasea&&123'
+export BORG_PASSPHRASE='123'
 # or this to ask an external program to supply the passphrase:
 #export BORG_PASSCOMMAND='pass show backup'
 
@@ -13,7 +14,9 @@ info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
 trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
 # Function for error messages
-errorecho() { cat <<< "$@" 1>&2; }
+#errorecho() { cat <<< "$@" 1>&2; }
+errorecho() { echo "$@"; }
+
 
 #Bail if borg is already running, maybe previous run didn't finish
 if pidof -x borg >/dev/null; then
@@ -36,34 +39,36 @@ fi
 #
 # nextcloudFileDir = the folder of your nextcloud installation
 nextcloudFileDir="/var/www/nextcloud"
-nextcloudDataDir="/var/nc_data"
+nextcloudDataDir="/var/nc-data"
 # dbdumpdir = the temp folder for db dumps
-dbdumpdir="/home/pi/dbdump"
+dbdumpdir="/home/art/dbdump"
 # dbdumpfilename = the name of the db dump file
-dbdumpfilename=$(hostname)-nextcloud-db.sql-$(date +"%Y-%m-%d %H:%M:%S")
+dbdumpfilename=$(hostname)-nextcloud-db.sql-$(date +"%Y-%m-%d_%H:%M:%S")
 
 #
 # database vars, substitute your own values here
 #
-dbUser="nextcloud"
-dbPassword="nextcloud"
-nextcloudDatabase="nextcloud"
+#dbUser="nextcloud"
+#dbPassword="nextcloud"
+#nextcloudDatabase="nextcloud"
 
 # exclude files and folders. You can tweak these and/or add more. These are just the vars. They vars are then appended to borg create
 exclude_updater="'$nextcloudDataDir/updater-*'"
 exclude_updater_hidden="'$nextcloudDataDir/updater-*/.*'"
+exclude_versions_dir="'/var/nc-data/*/files_versions/*'"
 
 #
 # webserver vars
 #
 webserverUser="www-data"
-webserverServiceName="apache2"
+webserverServiceName="nginx"
 
 info "Starting backup..."
 
 echo "Showing the excluded files and folders..."
 echo $exclude_updater
 echo $exclude_updater_hidden
+echo $exclude_versions_dir
 
 #
 # Set maintenance mode
@@ -88,8 +93,9 @@ echo
 # Backup DB. The db is dumped to a temp file folder. It will be picked up by the archive. Then removed later.
 #
 echo "Backup Nextcloud database..."
-mysqldump --single-transaction -h localhost -u "${dbUser}" -p"${dbPassword}" "${nextcloudDatabase}" > "${dbdumpdir}/${dbdumpfilename}"
-echo "mysql dump successful. Dump folder ${dbdumpdir}"
+#mysqldump --single-transaction -h localhost -u "${dbUser}" -p"${dbPassword}" "${nextcloudDatabase}" > "${dbdumpdir}/${dbdumpfilename}"
+docker exec -t -u postgres postgres pg_dumpall -c > "${dbdumpdir}/${dbdumpfilename}"
+echo "postgress dump successful. Dump folder ${dbdumpdir}"
 echo "Listing dump file..."
 ls -l ${dbdumpdir}
 echo
@@ -101,6 +107,18 @@ echo
 # Backup the nextlcoud directories and dbdump into an archive named after
 # the machine this script is currently running on:
 echo "Backup nextcloud files..."
+
+abc="'""/var/nc-data/*/files_versions/*""'"
+bcd="'/var/nc-data/art/files_versions/*'"
+def="\'/var/nc-data/*/files_versions/*\'"
+fgh="'/var/nc-data/*/files_versions/*'"
+
+hhh="'"/var/nc-data/*/files_versions/*"'";
+hhhh='/var/nc-data/*/files_versions/*';
+zzzz="$nextcloudDataDir*/files_versions/*"
+echo "$hhh"
+echo "$hhhh"
+echo "$zzzz"
 
 borg create                         \
     --verbose                       \
@@ -119,11 +137,13 @@ borg create                         \
     --exclude '*.log.*'             \
     --exclude $exclude_updater      \
     --exclude $exclude_updater_hidden \
+    --exclude "$zzzz" \
+   #--exclude /var/nc-data/*/files_versions/*'
 
 backup_exit=$?
 
 #
-# The db dump file is removed in this step as it it no longer needed. It has been included
+# The db dump file is removed in this step as it is no longer needed. It has been included
 # in the archive. It is removed to clean up the folder for future backups.
 #
 info "Remove the db backup file"
