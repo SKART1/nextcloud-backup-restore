@@ -111,7 +111,6 @@ delete_database_backup() {
 }
 
 pruning_repository() {
-  info "Pruning repository"
   borg prune                          \
       --list                          \
       -v                              \
@@ -120,7 +119,6 @@ pruning_repository() {
       --keep-daily=5                  \
       --keep-weekly=2                 \
       --keep-monthly=1
-  info "Done"
 }
 
 #----------program------------------
