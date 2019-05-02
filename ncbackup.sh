@@ -30,7 +30,7 @@ webserverServiceName="nginx"
 trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
 info() {
-  printf "\n%s %s\n" "$( date )" "$*" >&1;
+  printf "%s %s\n" "$( date )" "$*" >&1;
 }
 
 error_echo() {
