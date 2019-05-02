@@ -83,7 +83,7 @@ create_main_dump() {
       $nextcloudFileDir/config            \
       $nextcloudFileDir/themes            \
       $nextcloudDataDir                   \
-      $tempdir                            \
+      $tempdir/$dbdumpfilename            \
       --exclude-caches                    \
       --exclude '*.log'                   \
       --exclude '*.log.*'                 \
@@ -119,7 +119,7 @@ pruning_repository() {
       --show-rc                       \
       --keep-daily=5                  \
       --keep-weekly=2                 \
-      --keep-monthly=1                \
+      --keep-monthly=1
   info "Done"
 }
 
