@@ -1,186 +1,152 @@
-#!/bin/bash
+#!/bin/sh
+#Exit on any error
+set -e
 
-# Setting this, so the repo does not need to be given on the commandline:
+#----------globals------------------
 export BORG_REPO=/home/art/backup1
-#export BORG_REPO=/path-to-your-repo
-
-# Setting this, so you won't be asked for your repository passphrase:
-export BORG_PASSPHRASE='123'
-# or this to ask an external program to supply the passphrase:
-#export BORG_PASSCOMMAND='pass show backup'
-
-# some helpers and error handling:
-info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
-trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
-
-# Function for error messages
-#errorecho() { cat <<< "$@" 1>&2; }
-errorecho() { echo "$@"; }
+export BORG_PASSPHRASE="`cat secret.txt`"
 
 
-#Bail if borg is already running, maybe previous run didn't finish
-if pidof -x borg >/dev/null; then
-    echo "Backup already running"
-    mail -s "Nextcloud Backup. Borg already running." youremail@yourdomain < /home/pi/scripts/backup.txt
-    exit
-fi
-
-#
-# Check for root
-#
-if [ "$(id -u)" != "0" ]
-then
-	errorecho "ERROR: This script has to be run as root!"
-	exit 1
-fi
-
-#
+#----------parameters------------------
 # nextcloud vars
-#
-# nextcloudFileDir = the folder of your nextcloud installation
 nextcloudFileDir="/var/www/nextcloud"
 nextcloudDataDir="/var/nc-data"
-# dbdumpdir = the temp folder for db dumps
-dbdumpdir="/home/art/dbdump"
-# dbdumpfilename = the name of the db dump file
+
+#temp variables
+tempdir="/home/art/dbdump"
 dbdumpfilename=$(hostname)-nextcloud-db.sql-$(date +"%Y-%m-%d_%H:%M:%S")
 
-#
-# database vars, substitute your own values here
-#
-#dbUser="nextcloud"
-#dbPassword="nextcloud"
-#nextcloudDatabase="nextcloud"
+# exclude files and folders. They vars are then appended to borg create
+exclude_updater="$nextcloudDataDir/updater-*"
+exclude_updater_hidden="$nextcloudDataDir/updater-*/.*"
+exclude_versions_dir="$nextcloudDataDir*/files_versions/*"
 
-# exclude files and folders. You can tweak these and/or add more. These are just the vars. They vars are then appended to borg create
-exclude_updater="'$nextcloudDataDir/updater-*'"
-exclude_updater_hidden="'$nextcloudDataDir/updater-*/.*'"
-exclude_versions_dir="'/var/nc-data/*/files_versions/*'"
-
-#
 # webserver vars
-#
 webserverUser="www-data"
 webserverServiceName="nginx"
 
-info "Starting backup..."
 
-echo "Showing the excluded files and folders..."
-echo $exclude_updater
-echo $exclude_updater_hidden
-echo $exclude_versions_dir
+#----------helpers------------------
+trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
-#
-# Set maintenance mode
-#
-echo "Set maintenance mode for Nextcloud..."
-cd "${nextcloudFileDir}"
-sudo -u "${webserverUser}" php occ maintenance:mode --on
-cd ~
-echo "Done"
+info() {
+  printf "\n%s %s\n" "$( date )" "$*" >&1;
+}
+
+error_echo() {
+  echo "$@\n">&2;
+}
+
+check_already_running() {
+  if pidof -x borg >/dev/null; then
+    echo "Backup already running"
+    #mail -s "Nextcloud Backup. Borg already running." youremail@yourdomain < /home/pi/scripts/backup.txt
+    exit 1
+  fi
+}
+
+check_root() {
+  if [ "$(id -u)" != "0" ]
+  then
+  	error_echo "ERROR: This script has to be run as root!"
+  	exit 1
+  fi
+}
+
+enable_maintenance_mode() {
+  info "Enabling maintenance mode"
+  cd "${nextcloudFileDir}" && sudo -u "${webserverUser}" php occ maintenance:mode --on
+  info "Done"
+}
+
+stop_web_server() {
+  info "Stopping web-server"
+  service "${webserverServiceName}" stop
+  info "Done"
+}
+
+dump_database() {
+  info "Backup Nextcloud database"
+  docker exec -t -u postgres postgres pg_dumpall -c > "${tempdir}/${dbdumpfilename}"
+  info "Done"
+}
+
+create_main_dump() {
+  borg create                             \
+      --verbose                           \
+      --filter AME                        \
+      --list                              \
+      --stats                             \
+      --show-rc                           \
+      --compression lz4                   \
+      ::'{hostname}-{now}'                \
+      $nextcloudFileDir/config            \
+      $nextcloudFileDir/themes            \
+      $nextcloudDataDir                   \
+      $tempdir                            \
+      --exclude-caches                    \
+      --exclude '*.log'                   \
+      --exclude '*.log.*'                 \
+      --exclude "$exclude_updater"        \
+      --exclude "$exclude_updater_hidden" \
+      --exclude "$exclude_versions_dir"
+}
+
+disable_maintenance_mode() {
+  info "Disabling maintenance mode"
+  cd "${nextcloudFileDir}" && sudo -u "${webserverUser}" php occ maintenance:mode --off
+  info "Done"
+}
+
+start_web_server() {
+  info "Starting web server"
+  service "${webserverServiceName}" start
+  info "Done"
+}
+
+delete_database_backup() {
+  info "Remove the db backup file"
+  rm ${tempdir}/${dbdumpfilename}
+  info "Done"
+}
+
+pruning_repository() {
+  info "Pruning repository"
+  borg prune                          \
+      --list                          \
+      -v                              \
+      --prefix '{hostname}-'          \
+      --show-rc                       \
+      --keep-daily=5                  \
+      --keep-weekly=2                 \
+      --keep-monthly=1                \
+  info "Done"
+}
+
+#----------program------------------
+info "Checking conditions..."
+check_already_running
+check_root
 echo
 
-#
-# Stop web server
-#
-echo "Stopping web server..."
-service "${webserverServiceName}" stop
-echo "Done"
+info "Preparing..."
+enable_maintenance_mode
+stop_web_server
 echo
 
-
-#
-# Backup DB. The db is dumped to a temp file folder. It will be picked up by the archive. Then removed later.
-#
-echo "Backup Nextcloud database..."
-#mysqldump --single-transaction -h localhost -u "${dbUser}" -p"${dbPassword}" "${nextcloudDatabase}" > "${dbdumpdir}/${dbdumpfilename}"
-docker exec -t -u postgres postgres pg_dumpall -c > "${dbdumpdir}/${dbdumpfilename}"
-echo "postgress dump successful. Dump folder ${dbdumpdir}"
-echo "Listing dump file..."
-ls -l ${dbdumpdir}
-echo
-echo "Database backup size: $(stat --printf='%s' ${dbdumpdir}/${dbdumpfilename} | numfmt --to=iec)"
-echo
-echo "Done"
+info "Executing..."
+dump_database
+backup_exit=$(create_main_dump)
 echo
 
-# Backup the nextlcoud directories and dbdump into an archive named after
-# the machine this script is currently running on:
-echo "Backup nextcloud files..."
-
-abc="'""/var/nc-data/*/files_versions/*""'"
-bcd="'/var/nc-data/art/files_versions/*'"
-def="\'/var/nc-data/*/files_versions/*\'"
-fgh="'/var/nc-data/*/files_versions/*'"
-
-hhh="'"/var/nc-data/*/files_versions/*"'";
-hhhh='/var/nc-data/*/files_versions/*';
-zzzz="$nextcloudDataDir*/files_versions/*"
-echo "$hhh"
-echo "$hhhh"
-echo "$zzzz"
-
-borg create                         \
-    --verbose                       \
-    --filter AME                    \
-    --list                          \
-    --stats                         \
-    --show-rc                       \
-    --compression lz4               \
-    ::'{hostname}-{now}'            \
-    $nextcloudFileDir/config        \
-    $nextcloudFileDir/themes        \
-    $nextcloudDataDir               \
-    $dbdumpdir                      \
-    --exclude-caches                \
-    --exclude '*.log'               \
-    --exclude '*.log.*'             \
-    --exclude $exclude_updater      \
-    --exclude $exclude_updater_hidden \
-    --exclude "$zzzz" \
-   #--exclude /var/nc-data/*/files_versions/*'
-
-backup_exit=$?
-
-#
-# The db dump file is removed in this step as it is no longer needed. It has been included
-# in the archive. It is removed to clean up the folder for future backups.
-#
-info "Remove the db backup file"
-rm  ${dbdumpdir}/*
-echo "Done"
-
-info "Pruning repository"
-echo "Pruning repository. Daily 5, Weekly 2, Monthly 1". Note, you can change these values to your liking
-borg prune                          \
-    --list                          \
-    -v                              \
-    --prefix '{hostname}-'          \
-    --show-rc                       \
-    --keep-daily=5                  \
-    --keep-weekly=2                 \
-    --keep-monthly=1                \
-
-prune_exit=$?
-
-#
-# Start web server
-#
-echo
-echo "Starting web server..."
-service "${webserverServiceName}" start
-echo "Done"
+info "Restoring state..."
+disable_maintenance_mode
+start_web_server
 echo
 
-
-#
-# Disable maintenance mode
-#
-echo "Switching off maintenance mode..."
-cd "${nextcloudFileDir}"
-sudo -u "${webserverUser}" php occ maintenance:mode --off
-cd ~
-echo "Done"
+info "Cleaning..."
+delete_database_backup
+prune_exit=$(pruning_repository)
 echo
 
 # use highest exit code as global exit code
@@ -202,7 +168,6 @@ fi
 # like this: 55 23 * * * /root/backup.sh > /home/<user>/backup.txt 2>&1
 #
 # mail -s "Nextcloud Backup" youremail@yourdomain.com < /home/<user>/backup.txt
-
 exit ${global_exit}
 
-echo "DONE!"
+info "DONE!"
