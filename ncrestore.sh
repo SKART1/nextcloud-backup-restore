@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. helpers.sh
+. ./helpers.sh
 
 #------------settings--------
 extractTempDir=/home/art2/temp
