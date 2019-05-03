@@ -1,36 +1,12 @@
 #!/bin/sh
 
+. ./helpers.sh
+
+check_root
+
 #
 # Bash script for restoring backups of Nextcloud.
 # Usage: ./ncrestore.sh -a '<borg archive to restore>' -d '<database dump file>'
-# 
-
-# Setting this, so the repo does not need to be given on the commandline:
-export BORG_REPO=/path-to-your-repo
-
-# Setting this, so you won't be asked for your repository passphrase:
-#export BORG_PASSPHRASE='XYZl0ngandsecurepa_55_phrasea&&123'
-# or this to ask an external program to supply the passphrase:
-#export BORG_PASSCOMMAND='pass show backup'
-
-# some helpers and error handling:
-info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
-trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
-
-# Function for error messages
-errorecho() { cat <<< "$@" 1>&2; }
-
-#
-# Check for root
-#
-if [ "$(id -u)" != "0" ]
-then
-        errorecho "ERROR: This script has to be run as root!"
-        exit 1
-fi
-
-#
-# get the archive and database arguments
 #
 while getopts a:d: option
 do
@@ -59,10 +35,6 @@ if [ -z "${fileNameBackupDb}" ]
 exit 1
 fi
 
-# Variables
-# nextcloudFileDir = the folder of your nextcloud installation. This must match the path in the ncbackup.sh script
-nextcloudFileDir="/var/www/nextcloud"
-nextcloudDataDir="/var/nc_data"
 # dbdumpdir = the temp folder for db dumps. *** This must match the path used in ncbackup.sh ***
 dbdumpdir="/home/pi/dbdump"
 dbUser="nextcloud"
@@ -75,22 +47,9 @@ webserverServiceName="apache2"
 echo "borg archive is	 " $borg_archive
 echo "db file is	 " $fileNameBackupDb
 
-#
-# Set maintenance mode
-#
-echo "Set maintenance mode for Nextcloud..."
-cd "${nextcloudFileDir}"
-sudo -u "${webserverUser}" php occ maintenance:mode --on
-cd ~
-echo "Done"
-echo
-
-#
-# Stop web server
-#
-echo "Stopping web server..."
-service "${webserverServiceName}" stop
-echo "Done"
+info "Preparing..."
+enable_maintenance_mode
+stop_web_server
 echo
 
 #
