@@ -40,7 +40,6 @@ dbUser="nextcloud"
 dbPassword="nextcloud"
 nextcloudDatabase="nextcloud"
 webserverUser="www-data"
-webserverServiceName="apache2"
 
 # show variables
 echo "borg archive is	 " $borg_archive
