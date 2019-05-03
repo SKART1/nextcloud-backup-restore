@@ -64,8 +64,8 @@ cd ${extractTempDir} && borg extract -v --list ::"${borg_archive}"
 echo "Deleting old Nextcloud data directory... And copying new one"
 rm -r "${nextcloudDataDir}"
 mkdir -p "${nextcloudDataDir}"
-cp ${extractTempDir}/${nextcloudFileDir} ${nextcloudFileDir}
-cp ${extractTempDir}/${nextcloudDataDir} ${nextcloudDataDir}
+cp -r ${extractTempDir}/${nextcloudFileDir} ${nextcloudFileDir}
+cp -r ${extractTempDir}/${nextcloudDataDir} ${nextcloudDataDir}
 echo
 
 #
