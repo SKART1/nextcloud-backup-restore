@@ -60,7 +60,6 @@ echo
 # Restore the files from borg archive
 # 
 info "Doing..."
-cd ${extractTempDir}
 cd ${extractTempDir} && borg extract -v --list ::"${borg_archive}"
 echo "Deleting old Nextcloud data directory... And copying new one"
 rm -r "${nextcloudDataDir}"
