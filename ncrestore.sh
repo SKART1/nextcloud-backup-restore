@@ -36,7 +36,6 @@ exit 1
 fi
 
 # dbdumpdir = the temp folder for db dumps. *** This must match the path used in ncbackup.sh ***
-dbdumpdir="/home/pi/dbdump"
 dbUser="nextcloud"
 dbPassword="nextcloud"
 nextcloudDatabase="nextcloud"
@@ -59,7 +58,7 @@ echo
 echo "Changing to the root directory..."
 cd /
 echo "pwd is $(pwd)"
-echo "db backup file location is " "${dbdumpdir}/${fileNameBackupDb}"
+echo "db backup file location is " "${tempdir}/${fileNameBackupDb}"
 
 if [ $? -eq 0 ]; then
     echo "Done"
@@ -96,17 +95,14 @@ echo "Done"
 echo
 
 echo "Restoring backup DB..."
-mysql -h localhost -u "${dbUser}" -p"${dbPassword}" "${nextcloudDatabase}" < "${dbdumpdir}/${fileNameBackupDb}"
+mysql -h localhost -u "${dbUser}" -p"${dbPassword}" "${nextcloudDatabase}" < "${tempdir}/${fileNameBackupDb}"
 echo "Done"
 echo
 
 #
 # Start web server
 #
-echo "Starting web server..."
-service "${webserverServiceName}" start
-echo "Done"
-echo
+start_web_server
 
 #
 # Set directory permissions
@@ -127,15 +123,7 @@ cd ~
 echo "Done"
 echo
 
-#
-# Disable maintenance mode
-#
-echo "Switching off maintenance mode..."
-cd "${nextcloudFileDir}"
-sudo -u "${webserverUser}" php occ maintenance:mode --off
-cd ~
-#echo "Done"
-#echo
+disable_maintenance_mode
 
 echo
 echo "DONE!"
