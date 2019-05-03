@@ -3,7 +3,7 @@
 . ./helpers.sh
 
 #------------settings--------
-tempDir=/home/art2/temp
+extractTempDir=/home/art2/temp
 
 
 check_root
@@ -60,7 +60,7 @@ echo
 # Restore the files from borg archive
 # 
 info "Doing..."
-cd ${tempDir} && borg extract -v --list ::"${borg_archive}"
+cd ${extractTempDir} && borg extract -v --list ::"${borg_archive}"
 echo "Deleting old Nextcloud data directory... And copying new one"
 rm -r "${nextcloudDataDir}"
 mkdir -p "${nextcloudDataDir}"
@@ -71,21 +71,21 @@ echo
 #
 # Restore database
 #
-echo
-echo "Dropping old Nextcloud DB..."
-mysql -h localhost -u "${dbUser}" -p"${dbPassword}" -e "DROP DATABASE ${nextcloudDatabase}"
-echo "Done"
-echo
-
-echo "Creating new DB for Nextcloud..."
-mysql -h localhost -u "${dbUser}" -p"${dbPassword}" -e "CREATE DATABASE ${nextcloudDatabase}"
-echo "Done"
-echo
-
-echo "Restoring backup DB..."
-mysql -h localhost -u "${dbUser}" -p"${dbPassword}" "${nextcloudDatabase}" < "${tempdir}/${fileNameBackupDb}"
-echo "Done"
-echo
+#echo
+#echo "Dropping old Nextcloud DB..."
+#mysql -h localhost -u "${dbUser}" -p"${dbPassword}" -e "DROP DATABASE ${nextcloudDatabase}"
+#echo "Done"
+#echo
+#
+#echo "Creating new DB for Nextcloud..."
+#mysql -h localhost -u "${dbUser}" -p"${dbPassword}" -e "CREATE DATABASE ${nextcloudDatabase}"
+#echo "Done"
+#echo
+#
+#echo "Restoring backup DB..."
+#mysql -h localhost -u "${dbUser}" -p"${dbPassword}" "${nextcloudDatabase}" < "${tempdir}/${fileNameBackupDb}"
+#echo "Done"
+#echo
 
 #
 # Start web server
