@@ -7,6 +7,23 @@ set -e
 
 trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
+
+#----------globals------------------
+export BORG_REPO=/home/art/backup1
+export BORG_PASSPHRASE="`cat ./secret.txt`"
+
+
+#----------parameters------------------
+tempdir="/home/art/dbdump"
+dbdumpfilename=$(hostname)-nextcloud-db.sql-$(date +"%Y-%m-%d_%H:%M:%S")
+
+exclude_updater="$nextcloudDataDir/updater-*"
+exclude_updater_hidden="$nextcloudDataDir/updater-*/.*"
+exclude_versions_dir="$nextcloudDataDir*/files_versions/*"
+
+webserverUser="www-data"
+webserverServiceName="nginx"
+
 #----------program------------------
 info "Checking conditions..."
 check_already_running

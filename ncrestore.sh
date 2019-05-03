@@ -2,10 +2,20 @@
 
 . ./helpers.sh
 
-#------------settings--------
-extractTempDir=/home/art2/temp
-export BORG_REPO=/home/art2/backup1
+#----------globals------------------
+export BORG_REPO=/home/art/backup1
+export BORG_PASSPHRASE="`cat ./secret.txt`"
 
+
+#----------parameters------------------
+extractTempDir="/home/art2/temp"
+
+webserverUser="www-data"
+webserverServiceName="nginx"
+
+
+
+#-------------------actions----
 check_root
 
 #
@@ -55,13 +65,16 @@ stop_web_server
 echo
 
 
-
 #
 # Restore the files from borg archive
 # 
 info "Doing..."
+echo "Extracting archive"
+rm -r "${extractTempDir}"
+mkdir -p "${extractTempDir}"
 cd ${extractTempDir} && borg extract -v --list ::"${borg_archive}"
-echo "Deleting old Nextcloud data directory... And copying new one"
+
+echo "Replacing current nextcloud with one from backup"
 rm -r "${nextcloudDataDir}"
 mkdir -p "${nextcloudDataDir}"
 cp -r ${extractTempDir}/${nextcloudFileDir} ${nextcloudFileDir}
