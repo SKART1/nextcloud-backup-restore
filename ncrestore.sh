@@ -50,20 +50,19 @@ enable_maintenance_mode
 stop_web_server
 echo
 
-echo
+
+
+#
+# Restore the files from borg archive
+# 
+info "Doing..."
+cd ${tempDir} && borg extract -v --list ::"${borg_archive}"
 echo "Deleting old Nextcloud data directory... And copying new one"
 rm -r "${nextcloudDataDir}"
 mkdir -p "${nextcloudDataDir}"
 cp ${tempdir}/${nextcloudFileDir} ${nextcloudFileDir}
 cp ${tempdir}/${nextcloudDataDir} ${nextcloudDataDir}
-echo "Done"
 echo
-
-#
-# Restore the files from borg archive
-# 
-echo "Restoring Borg Archive" $borg_archive
-borg extract -v --list ::"${borg_archive}"
 
 #
 # Restore database
