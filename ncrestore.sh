@@ -4,7 +4,7 @@
 
 #------------settings--------
 extractTempDir=/home/art2/temp
-
+export BORG_REPO=/home/art2/backup1
 
 check_root
 
