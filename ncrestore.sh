@@ -2,6 +2,10 @@
 
 . ./helpers.sh
 
+#------------settings--------
+tempDir=/home/art2/temp
+
+
 check_root
 
 #
