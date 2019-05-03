@@ -39,7 +39,7 @@ fi
 dbUser="nextcloud"
 dbPassword="nextcloud"
 nextcloudDatabase="nextcloud"
-webserverUser="www-data"
+
 
 # show variables
 echo "borg archive is	 " $borg_archive
@@ -50,26 +50,12 @@ enable_maintenance_mode
 stop_web_server
 echo
 
-#
-# change to the root dir. This is critical as borg extract uses relative dir so we must change to the root for the 
-# extract to restore the files properly
-#
-echo "Changing to the root directory..."
-cd /
-echo "pwd is $(pwd)"
-echo "db backup file location is " "${tempdir}/${fileNameBackupDb}"
-
-if [ $? -eq 0 ]; then
-    echo "Done"
-else
-    echo "failed to change to root dir. Restore failed"
-exit 1
-fi
-
 echo
-echo "Deleting old Nextcloud data directory..."
+echo "Deleting old Nextcloud data directory... And copying new one"
 rm -r "${nextcloudDataDir}"
 mkdir -p "${nextcloudDataDir}"
+cp ${tempdir}/${nextcloudFileDir} ${nextcloudFileDir}
+cp ${tempdir}/${nextcloudDataDir} ${nextcloudDataDir}
 echo "Done"
 echo
 
