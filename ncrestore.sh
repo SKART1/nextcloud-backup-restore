@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $(dirname "$0")/helpers.sh
+. ./helpers.sh
 
 #------------settings--------
 extractTempDir=/home/art2/temp
@@ -64,8 +64,8 @@ cd ${extractTempDir} && borg extract -v --list ::"${borg_archive}"
 echo "Deleting old Nextcloud data directory... And copying new one"
 rm -r "${nextcloudDataDir}"
 mkdir -p "${nextcloudDataDir}"
-cp ${tempdir}/${nextcloudFileDir} ${nextcloudFileDir}
-cp ${tempdir}/${nextcloudDataDir} ${nextcloudDataDir}
+cp ${extractTempDir}/${nextcloudFileDir} ${nextcloudFileDir}
+cp ${extractTempDir}/${nextcloudDataDir} ${nextcloudDataDir}
 echo
 
 #
