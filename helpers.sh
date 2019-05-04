@@ -66,7 +66,7 @@ dump_database() {
 
 create_main_dump() {
   info "Creating backup"
-  borg create                             \
+  res = borg create                       \
       --verbose                           \
       --filter AME                        \
       --list                              \
@@ -117,5 +117,5 @@ pruning_repository() {
             --keep-weekly=2                 \
             --keep-monthly=1
   info "Done\n"
-  return res
+  return $res
 }
