@@ -34,7 +34,8 @@ echo
 
 stage "Executing..."
 dump_database
-backup_exit=$(create_main_dump)
+create_main_dump
+prune_exit=$?
 echo
 
 stage "Restoring state..."
@@ -44,7 +45,8 @@ echo
 
 stage "Cleaning..."
 delete_database_backup
-prune_exit=$(pruning_repository)
+pruning_repository
+prune_exit=$?
 echo
 
 # use highest exit code as global exit code
