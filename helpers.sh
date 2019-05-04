@@ -54,26 +54,26 @@ enable_maintenance_mode() {
 
 stop_web_server() {
   info "Stopping web-server"
-  sudo service "${webserver_service_name}" stop | append_tab
+  service "${webserver_service_name}" stop | append_tab
   info "Done\n"
 }
 
 dump_database() {
   info "Backup Nextcloud database"
-  sudo docker exec -t -u postgres postgres pg_dumpall -c > "${db_dump_dir}/${db_dump_filename}" | append_tab
+  docker exec -t -u postgres postgres pg_dumpall -c > "${db_dump_dir}/${db_dump_filename}" | append_tab
   info "Done\n"
 }
 
 create_main_dump() {
   info "Creating backup"
-  sudo borg create                          \
+  borg create                               \
       --verbose                             \
       --filter AME                          \
       --list                                \
       --stats                               \
       --show-rc                             \
       --compression lz4                     \
-      ${BORG_REPO}::{hostname}-{now}        \
+      ::{hostname}-{now}                    \
       ${nextcloudFileDir}/config            \
       ${nextcloudFileDir}/themes            \
       ${nextcloudDataDir}                   \
@@ -97,7 +97,7 @@ disable_maintenance_mode() {
 
 start_web_server() {
   info "Starting web server"
-  sudo service "${webserver_service_name}" start | append_tab
+  service "${webserver_service_name}" start | append_tab
   info "Done\n"
 }
 

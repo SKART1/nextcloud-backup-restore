@@ -23,6 +23,7 @@ webserver_service_name="nginx"
 
 #----------program------------------
 stage "Checking conditions..."
+check_root
 check_already_running
 echo
 
