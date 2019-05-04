@@ -73,7 +73,7 @@ create_main_dump() {
       --stats                               \
       --show-rc                             \
       --compression lz4                     \
-      ::'{hostname}-{now}'                  \
+      ::{hostname}-{now}                    \
       ${nextcloudFileDir}/config            \
       ${nextcloudFileDir}/themes            \
       ${nextcloudDataDir}                   \
