@@ -75,10 +75,10 @@ mkdir -p "${extractTempDir}"
 cd ${extractTempDir} && borg extract -v --list ::"${borg_archive}"
 
 echo "Replacing current nextcloud with one from backup"
-rm -r "${nextcloudDataDir}"
+rm -R "${nextcloudDataDir}"
 mkdir -p "${nextcloudDataDir}"
-cp -r ${extractTempDir}/${nextcloudDataDir}/ ${nextcloudDataDir}
-cp -r ${extractTempDir}/${nextcloudFileDir}/ ${nextcloudFileDir}
+cp -R ${extractTempDir}/${nextcloudDataDir}/ ${nextcloudDataDir}/
+cp -R ${extractTempDir}/${nextcloudFileDir}/ ${nextcloudFileDir}/
 echo
 
 #
