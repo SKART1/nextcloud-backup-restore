@@ -91,19 +91,19 @@ create_main_dump() {
 
 disable_maintenance_mode() {
   info "Disabling maintenance mode"
-  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --off
+  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --off | append_tab
   info "Done\n"
 }
 
 start_web_server() {
   info "Starting web server"
-  service "${webserver_service_name}" start
+  service "${webserver_service_name}" start | append_tab
   info "Done\n"
 }
 
 delete_database_backup() {
   info "Remove the db backup file"
-  rm ${db_dump_dir}/${db_dump_filename}
+  rm ${db_dump_dir}/${db_dump_filename} | append_tab
   info "Done\n"
 }
 
