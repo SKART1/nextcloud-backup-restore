@@ -48,19 +48,19 @@ copy_from_one_directory_to_another() {
 
 enable_maintenance_mode() {
   info "Enabling maintenance mode"
-  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --on | append_tab
+  sudo cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --on | append_tab
   info "Done\n"
 }
 
 stop_web_server() {
   info "Stopping web-server"
-  service "${webserver_service_name}" stop | append_tab
+  sudo service "${webserver_service_name}" stop | append_tab
   info "Done\n"
 }
 
 dump_database() {
   info "Backup Nextcloud database"
-  docker exec -t -u postgres postgres pg_dumpall -c > "${db_dump_dir}/${db_dump_filename}" | append_tab
+  sudo docker exec -t -u postgres postgres pg_dumpall -c > "${db_dump_dir}/${db_dump_filename}" | append_tab
   info "Done\n"
 }
 
@@ -91,13 +91,13 @@ create_main_dump() {
 
 disable_maintenance_mode() {
   info "Disabling maintenance mode"
-  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --off | append_tab
+  sudo cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --off | append_tab
   info "Done\n"
 }
 
 start_web_server() {
   info "Starting web server"
-  service "${webserver_service_name}" start | append_tab
+  sudo service "${webserver_service_name}" start | append_tab
   info "Done\n"
 }
 
