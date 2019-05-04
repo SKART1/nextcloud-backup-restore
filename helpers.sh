@@ -83,7 +83,7 @@ create_main_dump() {
       --exclude '*.log.*'                   \
       --exclude "${exclude_updater}"        \
       --exclude "${exclude_updater_hidden}" \
-      --exclude "${exclude_versions_dir}"   | append_tab
+      --exclude "${exclude_versions_dir}" 2>&1 | append_tab
   local res=$?
   info "Done\n"
   return ${res}
@@ -109,14 +109,15 @@ delete_database_backup() {
 
 pruning_repository() {
   info "Pruning repository"
-  res = borg prune                          \
-            --list                          \
-            -v                              \
-            --prefix '{hostname}-'          \
-            --show-rc                       \
-            --keep-daily=5                  \
-            --keep-weekly=2                 \
-            --keep-monthly=1
+  borg prune                          \
+      --list                          \
+      -v                              \
+      --prefix '{hostname}-'          \
+      --show-rc                       \
+      --keep-daily=5                  \
+      --keep-weekly=2                 \
+      --keep-monthly=1 2>&1 | append_tab
+  local res=$?
   info "Done\n"
-  return $res
+  return ${res}
 }
