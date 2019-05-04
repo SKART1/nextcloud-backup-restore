@@ -83,7 +83,7 @@ create_main_dump() {
       --exclude '*.log.*'                   \
       --exclude "${exclude_updater}"        \
       --exclude "${exclude_updater_hidden}" \
-      --exclude "${exclude_versions_dir}" 2>&1 | append_tab
+      --exclude "${exclude_versions_dir}" 2>&1
   local res=$?
   info "Done\n"
   return ${res}
