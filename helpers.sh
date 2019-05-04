@@ -39,7 +39,7 @@ check_root() {
 }
 
 clear_directory() {
-  rm -R $1
+  rm -R $1/*
 }
 
 copy_from_one_directory_to_another() {
