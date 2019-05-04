@@ -66,26 +66,27 @@ dump_database() {
 
 create_main_dump() {
   info "Creating backup"
-  res = borg create                       \
-      --verbose                           \
-      --filter AME                        \
-      --list                              \
-      --stats                             \
-      --show-rc                           \
-      --compression lz4                   \
-      ::'{hostname}-{now}'                \
-      ${nextcloudFileDir}/config          \
-      ${nextcloudFileDir}/themes          \
-      ${nextcloudDataDir}                 \
-      ${db_dump_dir}/${db_dump_filename}  \
-      --exclude-caches                    \
-      --exclude '*.log'                   \
-      --exclude '*.log.*'                 \
-      --exclude "$exclude_updater"        \
-      --exclude "$exclude_updater_hidden" \
-      --exclude "$exclude_versions_dir"   | append_tab
+  borg create                               \
+      --verbose                             \
+      --filter AME                          \
+      --list                                \
+      --stats                               \
+      --show-rc                             \
+      --compression lz4                     \
+      ::'{hostname}-{now}'                  \
+      ${nextcloudFileDir}/config            \
+      ${nextcloudFileDir}/themes            \
+      ${nextcloudDataDir}                   \
+      ${db_dump_dir}/${db_dump_filename}    \
+      --exclude-caches                      \
+      --exclude '*.log'                     \
+      --exclude '*.log.*'                   \
+      --exclude "${exclude_updater}"        \
+      --exclude "${exclude_updater_hidden}" \
+      --exclude "${exclude_versions_dir}"   | append_tab
+  local res=$?
   info "Done\n"
-  return res
+  return ${res}
 }
 
 disable_maintenance_mode() {
