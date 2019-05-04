@@ -49,19 +49,19 @@ copy_from_one_directory_to_another() {
 enable_maintenance_mode() {
   info "Enabling maintenance mode"
   cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --on | append_tab
-  info "Done"
+  info "Done\n"
 }
 
 stop_web_server() {
   info "Stopping web-server"
   service "${webserver_service_name}" stop | append_tab
-  info "Done"
+  info "Done\n"
 }
 
 dump_database() {
   info "Backup Nextcloud database"
-  docker exec -t -u postgres postgres pg_dumpall -c > "${tempdir}/${db_dump_filename}" | append_tab
-  info "Done"
+  docker exec -t -u postgres postgres pg_dumpall -c > "${db_dump_dir}/${db_dump_filename}" | append_tab
+  info "Done\n"
 }
 
 create_main_dump() {
@@ -84,26 +84,26 @@ create_main_dump() {
       --exclude "$exclude_updater"        \
       --exclude "$exclude_updater_hidden" \
       --exclude "$exclude_versions_dir"   | append_tab
-  info "Done"
+  info "Done\n"
   return res
 }
 
 disable_maintenance_mode() {
   info "Disabling maintenance mode"
   cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --off
-  info "Done"
+  info "Done\n"
 }
 
 start_web_server() {
   info "Starting web server"
   service "${webserver_service_name}" start
-  info "Done"
+  info "Done\n"
 }
 
 delete_database_backup() {
   info "Remove the db backup file"
   rm ${db_dump_dir}/${db_dump_filename}
-  info "Done"
+  info "Done\n"
 }
 
 pruning_repository() {
@@ -116,6 +116,6 @@ pruning_repository() {
             --keep-daily=5                  \
             --keep-weekly=2                 \
             --keep-monthly=1
-  info "Done"
+  info "Done\n"
   return res
 }
