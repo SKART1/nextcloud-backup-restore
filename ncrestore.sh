@@ -13,27 +13,8 @@ extract_temp_dir="/home/art2/temp"
 webserver_user="www-data"
 webserver_service_name="nginx"
 
-
-
-# dbdumpdir = the temp folder for db dumps. *** This must match the path used in ncbackup.sh ***
-dbUser="nextcloud"
-dbPassword="nextcloud"
 nextcloudDatabase="nextcloud"
-
-
-
-
-#
-# Bash script for restoring backups of Nextcloud.
-# Usage: ./ncrestore.sh -a '<borg archive to restore>' -d '<database dump file>'
-#
-while getopts a:d: option
-do
- case "${option}"
- in
- a) borg_archive=${OPTARG};;
- esac
-done
+borg_archive=$1
 
 if [ $# -eq 0 ]
   then
@@ -69,9 +50,6 @@ copy_from_one_directory_to_another ${extract_temp_dir}/${nextcloudDataDir} ${nex
 copy_from_one_directory_to_another ${extract_temp_dir}/${nextcloudFileDir} ${nextcloudFileDir}
 info
 
-
-
-
 #
 # Restore database
 #
@@ -81,19 +59,11 @@ docker exec -it postgres psql -U postgres -c "DROP DATABASE ${nextcloudDatabase}
 echo "Done"
 echo
 
-echo "Creating new DB for Nextcloud..."
-docker exec -it postgres psql -U postgres -c "CREATE DATABASE ${nextcloudDatabase}"
-echo "Done"
-echo
-
 echo "Restoring backup DB..."
 cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | docker exec -i postgres psql -U postgres -d ${nextcloudDatabase}
 echo "Done"
 echo
 
-#
-# Start web server
-#
 start_web_server
 
 #
@@ -112,10 +82,7 @@ echo "Updating the system data-fingerprint..."
 cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:data-fingerprint
 echo "Done"
 
-
 stage "Restoring state..."
 disable_maintenance_mode
 
-echo
 stage "DONE!"
-echo "Backup ${restore} successfully restored."
