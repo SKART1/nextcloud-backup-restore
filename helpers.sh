@@ -44,7 +44,7 @@ copy_from_one_directory_to_another() {
 
 enable_maintenance_mode() {
   info "Enabling maintenance mode"
-  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --on
+  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --on 1>/dev/null
   info "Done"
 }
 
