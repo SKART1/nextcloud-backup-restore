@@ -75,21 +75,21 @@ info
 #
 # Restore database
 #
-#echo
-#echo "Dropping old Nextcloud DB..."
-#mysql -h localhost -u "${dbUser}" -p"${dbPassword}" -e "DROP DATABASE ${nextcloudDatabase}"
-#echo "Done"
-#echo
-#
-#echo "Creating new DB for Nextcloud..."
-#mysql -h localhost -u "${dbUser}" -p"${dbPassword}" -e "CREATE DATABASE ${nextcloudDatabase}"
-#echo "Done"
-#echo
-#
-#echo "Restoring backup DB..."
-#mysql -h localhost -u "${dbUser}" -p"${dbPassword}" "${nextcloudDatabase}" < "${tempdir}/${fileNameBackupDb}"
-#echo "Done"
-#echo
+echo
+echo "Dropping old Nextcloud DB..."
+docker exec -it postgres psql -U postgres -c "DROP DATABASE ${nextcloudDatabase}"
+echo "Done"
+echo
+
+echo "Creating new DB for Nextcloud..."
+docker exec -it postgres psql -U postgres -c "CREATE DATABASE ${nextcloudDatabase}"
+echo "Done"
+echo
+
+echo "Restoring backup DB..."
+cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | docker exec -i postgres psql -U postgres -d ${nextcloudDatabase}
+echo "Done"
+echo
 
 #
 # Start web server
