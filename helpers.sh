@@ -56,9 +56,9 @@ create_main_dump() {
       --show-rc                           \
       --compression lz4                   \
       ::'{hostname}-{now}'                \
-      $nextcloudFileDir/config            \
-      $nextcloudFileDir/themes            \
-      $nextcloudDataDir                   \
+      ${nextcloudFileDir}/config          \
+      ${nextcloudFileDir}/themes          \
+      ${nextcloudDataDir}                 \
       $tempdir/$dbdumpfilename            \
       --exclude-caches                    \
       --exclude '*.log'                   \
