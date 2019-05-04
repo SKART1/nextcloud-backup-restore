@@ -66,7 +66,7 @@ dump_database() {
 
 create_main_dump() {
   info "Creating backup"
-  borg create                               \
+  sudo borg create                          \
       --verbose                             \
       --filter AME                          \
       --list                                \
