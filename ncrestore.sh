@@ -117,5 +117,5 @@ stage "Restoring state..."
 disable_maintenance_mode
 
 echo
-echo "DONE!"
+stage "DONE!"
 echo "Backup ${restore} successfully restored."

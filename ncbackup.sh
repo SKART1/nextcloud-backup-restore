@@ -62,6 +62,8 @@ then
     stage "Backup and/or Prune finished with an error"
 fi
 
+stage "DONE!"
+
 #
 # send email. Uncomment the below line to send an email. This requires you first setup a MTA
 # To send mail, setup your cron script
@@ -69,5 +71,3 @@ fi
 #
 # mail -s "Nextcloud Backup" youremail@yourdomain.com < /home/<user>/backup.txt
 exit ${global_exit}
-
-stage "DONE!"
