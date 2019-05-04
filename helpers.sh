@@ -48,7 +48,7 @@ copy_from_one_directory_to_another() {
 
 enable_maintenance_mode() {
   info "Enabling maintenance mode"
-  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --on | append_tab
+  sudo -u "${webserver_user}" php ${nextcloudFileDir}/occ maintenance:mode --on | append_tab
   info "Done\n"
 }
 
@@ -91,7 +91,7 @@ create_main_dump() {
 
 disable_maintenance_mode() {
   info "Disabling maintenance mode"
-  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --off | append_tab
+  sudo -u "${webserver_user}" php ${nextcloudFileDir}/occ maintenance:mode --off | append_tab
   info "Done\n"
 }
 
