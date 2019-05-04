@@ -15,6 +15,10 @@ info() {
   echo "\t$@";
 }
 
+append_tab() {
+   sed 's/^/\t/'
+}
+
 error_echo() {
   echo "$@\n">&2;
 }
@@ -44,19 +48,19 @@ copy_from_one_directory_to_another() {
 
 enable_maintenance_mode() {
   info "Enabling maintenance mode"
-  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --on 1>/dev/null
+  cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:mode --on | append_tab
   info "Done"
 }
 
 stop_web_server() {
   info "Stopping web-server"
-  service "${webserver_service_name}" stop
+  service "${webserver_service_name}" stop | append_tab
   info "Done"
 }
 
 dump_database() {
   info "Backup Nextcloud database"
-  docker exec -t -u postgres postgres pg_dumpall -c > "${tempdir}/${db_dump_filename}"
+  docker exec -t -u postgres postgres pg_dumpall -c > "${tempdir}/${db_dump_filename}" | append_tab
   info "Done"
 }
 
@@ -79,7 +83,7 @@ create_main_dump() {
       --exclude '*.log.*'                 \
       --exclude "$exclude_updater"        \
       --exclude "$exclude_updater_hidden" \
-      --exclude "$exclude_versions_dir"
+      --exclude "$exclude_versions_dir"   | append_tab
   info "Done"
   return res
 }
