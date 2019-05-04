@@ -8,15 +8,20 @@ export BORG_PASSPHRASE="`cat ./secret.txt`"
 
 
 #----------parameters------------------
-extractTempDir="/home/art2/temp"
+extract_temp_dir="/home/art2/temp"
 
-webserverUser="www-data"
-webserverServiceName="nginx"
+webserver_user="www-data"
+webserver_service_name="nginx"
 
 
 
-#-------------------actions----
-check_root
+# dbdumpdir = the temp folder for db dumps. *** This must match the path used in ncbackup.sh ***
+dbUser="nextcloud"
+dbPassword="nextcloud"
+nextcloudDatabase="nextcloud"
+
+
+
 
 #
 # Bash script for restoring backups of Nextcloud.
@@ -27,7 +32,6 @@ do
  case "${option}"
  in
  a) borg_archive=${OPTARG};;
- d) fileNameBackupDb=${OPTARG};;
  esac
 done
 
@@ -43,43 +47,30 @@ if [ -z "${borg_archive}" ]
 exit 1
 fi
 
-if [ -z "${fileNameBackupDb}" ]
-  then
-    echo "No database file supplied"
-exit 1
-fi
+#----------program------------------
+stage "Checking conditions..."
+check_root
+echo
 
-# dbdumpdir = the temp folder for db dumps. *** This must match the path used in ncbackup.sh ***
-dbUser="nextcloud"
-dbPassword="nextcloud"
-nextcloudDatabase="nextcloud"
-
-
-# show variables
-echo "borg archive is	 " $borg_archive
-echo "db file is	 " $fileNameBackupDb
-
-info "Preparing..."
+stage "Preparing..."
 enable_maintenance_mode
 stop_web_server
 echo
 
+stage "Executing..."
+info "Extracting archive"
+clear_directory ${extract_temp_dir}
+cd ${extract_temp_dir} && borg extract -v --list ::"${borg_archive}"
+info "Done"
 
-#
-# Restore the files from borg archive
-# 
-info "Doing..."
-echo "Extracting archive"
-rm -r "${extractTempDir}"
-mkdir -p "${extractTempDir}"
-cd ${extractTempDir} && borg extract -v --list ::"${borg_archive}"
+info "Replacing current nextcloud with one from backup"
+clear_directory ${nextcloudDataDir}
+copy_from_one_directory_to_another ${extract_temp_dir}/${nextcloudDataDir} ${nextcloudDataDir}
+copy_from_one_directory_to_another ${extract_temp_dir}/${nextcloudFileDir} ${nextcloudFileDir}
+info
 
-echo "Replacing current nextcloud with one from backup"
-rm -R "${nextcloudDataDir}"
-mkdir -p "${nextcloudDataDir}"
-cp -R ${extractTempDir}/${nextcloudDataDir}/. ${nextcloudDataDir}/
-cp -R ${extractTempDir}/${nextcloudFileDir}/. ${nextcloudFileDir}/
-echo
+
+
 
 #
 # Restore database
@@ -109,8 +100,8 @@ start_web_server
 # Set directory permissions
 #
 echo "Setting directory permissions..."
-chown -R "${webserverUser}":"${webserverUser}" "${nextcloudFileDir}"
-chown -R "${webserverUser}":"${webserverUser}" "${nextcloudDataDir}"
+chown -R "${webserver_user}":"${webserver_user}" "${nextcloudFileDir}"
+chown -R "${webserver_user}":"${webserver_user}" "${nextcloudDataDir}"
 echo "Done"
 echo
 
@@ -118,12 +109,11 @@ echo
 # Update the system data-fingerprint (see https://docs.nextcloud.com/server/12/admin_manual/configuration_server/occ_command.html#maintenance-commands-label)
 #
 echo "Updating the system data-fingerprint..."
-cd "${nextcloudFileDir}"
-sudo -u "${webserverUser}" php occ maintenance:data-fingerprint
-cd ~
+cd "${nextcloudFileDir}" && sudo -u "${webserver_user}" php occ maintenance:data-fingerprint
 echo "Done"
-echo
 
+
+stage "Restoring state..."
 disable_maintenance_mode
 
 echo
