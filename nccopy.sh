@@ -9,7 +9,7 @@ trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
 
 #----------globals------------------
-export BORG_REPO=/home/art
+export BORG_REPO=/home/art2
 target_directory=/home/art2/WebDav/Acc2
 
 #----------program------------------
