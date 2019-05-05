@@ -25,9 +25,10 @@ for file in "$BORG_REPO"/data/0/*; do
     if [ -L "$file" ]; then
         continue;
     else
+        fileName=$(basename $file)
         mkdir -p ${target_directory}/data/0 && mv $file ${target_directory}/data/0/
-        ln -s ${target_directory}/data/0/$file $file
-        echo "$file is not a symlink";
+        ln -s ${target_directory}/data/0/$fileName $file
+        echo "$file done";
     fi
 done
 
