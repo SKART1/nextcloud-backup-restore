@@ -26,7 +26,7 @@ for file in "$BORG_REPO"/data/0/*; do
         continue;
     else
         mkdir -p ${target_directory}/data/0 && mv $file ${target_directory}/data/0/
-        ln -s ${target_directory}/data/0/$file ./$file
+        ln -s ${target_directory}/data/0/$file $file
         echo "$file is not a symlink";
     fi
 done
