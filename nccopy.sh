@@ -25,8 +25,8 @@ for file in "$BORG_REPO"/data/0/*; do
     if [ -L "$file" ]; then
         continue;
     else
-        mv ./$file ${target_directory}/data/0/
-        ln -s ${target_directory}/data/0/$file ./$file
+        cp $file ${target_directory}/data/0/
+        #ln -s ${target_directory}/data/0/$file ./$file
         echo "$file is not a symlink";
     fi
 done
