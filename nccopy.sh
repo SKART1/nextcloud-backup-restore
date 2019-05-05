@@ -14,7 +14,7 @@ target_directory=/home/art2/WebDav/Acc2
 
 #----------program------------------
 stage "Checking conditions..."
-check_root
+#check_root
 echo
 
 stage "Preparing..."
