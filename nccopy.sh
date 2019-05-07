@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 . ./helpers.sh
 
@@ -11,6 +11,32 @@ trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 #----------globals------------------
 export BORG_REPO=/home/art2/backup1
 target_directory=/home/art2/WebDav/Acc2
+possible_target_directories=('/home/art' '/LinStor');
+declare -A spaces_array
+
+#----------functions------------------
+build_free_space_array() {
+  for idx in "${!possible_target_directories[@]}"; do
+    spaces_array[$idx]=$(free_space_in_directory_in_bytes ${possible_target_directories[$idx]})
+  done
+}
+
+free_space_in_directory_in_bytes() {
+  local res=$(df --output=avail -B 1 "$1" | tail -n 1)
+  echo $((res*95/100))
+}
+
+select_file() {
+  res=-1
+  for idx in "${!spaces_array[@]}"; do
+    if [[ ${spaces_array[$idx]} -ge $1 ]]; then
+      spaces_array[$idx]=$((${spaces_array[$idx]}-$1))
+      res=${possible_target_directories[$idx]}
+      break
+    fi
+  done
+  echo ${res}
+}
 
 #----------program------------------
 stage "Checking conditions..."
@@ -21,16 +47,21 @@ stage "Preparing..."
 echo
 
 stage "Executing..."
-for file in "$BORG_REPO"/data/0/*; do
-    if [ -L "$file" ]; then
-        continue;
-    else
-        fileName=$(basename $file)
-        mkdir -p ${target_directory}/data/0 && mv $file ${target_directory}/data/0/
-        ln -s ${target_directory}/data/0/$fileName $file
-        echo "$file done";
-    fi
-done
+build_free_space_array
+printf '%s\n' "${spaces_array[@]}"
+select_file 9808668032
+
+
+#for file in "$BORG_REPO"/data/0/*; do
+#  if [ -L "$file" ]; then
+#    continue;
+#  else
+#    fileName=$(basename $file)
+#    mkdir -p ${target_directory}/data/0 && mv $file ${target_directory}/data/0/
+#    ln -s ${target_directory}/data/0/$fileName $file
+#    echo "$file done";
+#  fi
+#done
 
 #for file in "$BORG_REPO"/* "$BORG_REPO"/.* ; do
 #  if [[ -L "$file" ]]; then echo "$file is a symlink"; else echo "$file is not a symlink"; fi
