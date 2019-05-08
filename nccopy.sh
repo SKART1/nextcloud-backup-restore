@@ -60,7 +60,7 @@ for file in "$BORG_REPO"/data/0/*; do
     file_size=$(file_size_in_bytes ${file})
     target_dir=$(select_file_decrease_space ${file_size})
     if [[ $target_dir -eq -1 ]]; then
-      error_echo "No directory found for ${file} with size $(${file_size}/1024) kB"
+      error_echo "No directory found for ${file} with size $((${file_size}/1024)) kB"
   	  exit 1
     fi
     mkdir -p ${target_dir}/data/0 && mv ${file} ${target_dir}/data/0/
