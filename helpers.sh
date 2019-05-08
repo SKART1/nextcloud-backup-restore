@@ -25,7 +25,7 @@ error_echo() {
 
 check_already_running() {
   if pidof -x borg >/dev/null; then
-    echo "Backup already running"
+    error_echo "Backup already running"
     exit 1
   fi
 }
