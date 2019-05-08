@@ -20,7 +20,7 @@ append_tab() {
 }
 
 error_echo() {
-  echo "$@\n">&2;
+  printf "$@\n">&2;
 }
 
 check_already_running() {
