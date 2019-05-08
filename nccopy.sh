@@ -26,7 +26,7 @@ free_space_in_directory_in_bytes() {
 }
 
 select_file_decrease_space() {
-  res=-1
+  res=""
   for idx in "${!spaces_array[@]}"; do
     if [[ ${spaces_array[$idx]} -ge $1 ]]; then
       spaces_array[$idx]=$((${spaces_array[$idx]}-$1))
@@ -59,7 +59,7 @@ for file in "$BORG_REPO"/data/0/*; do
     fileName=$(basename ${file})
     file_size=$(file_size_in_bytes ${file})
     target_dir=$(select_file_decrease_space ${file_size})
-    if [[ $target_dir -eq '-1' ]]; then
+    if [ $target_dir -eq "" ]; then
       error_echo "No directory found for ${file} with size $((${file_size}/1024)) kB"
   	  exit 1
     fi
