@@ -34,7 +34,7 @@ echo
 stage "Executing..."
 dump_database
 create_main_dump
-prune_exit=$?
+backup_exit=$?
 echo
 
 stage "Restoring state..."
@@ -44,7 +44,7 @@ echo
 
 stage "Cleaning..."
 delete_database_backup
-pruning_repository
+#pruning_repository
 prune_exit=$?
 echo
 
