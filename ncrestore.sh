@@ -4,7 +4,7 @@
 
 #----------globals------------------
 export BORG_REPO="/home/art2/backup1"
-export BORG_PASSPHRASE="`cat secret.txt`"
+export BORG_PASSPHRASE="`cat ./secret.txt`"
 
 
 #----------parameters------------------
