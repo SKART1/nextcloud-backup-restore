@@ -8,8 +8,7 @@ set -e
 trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
 #----------globals------------------
-export BORG_REPO=/home/art2/backup1
-target_directory=/home/art2/WebDav/Acc2
+export BORG_REPO="/home/art2/backup1"
 possible_target_directories=('/home/art' '/LinStor');
 declare -A spaces_array
 
