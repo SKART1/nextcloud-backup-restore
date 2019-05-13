@@ -16,6 +16,7 @@ export BORG_PASSPHRASE="`cat ./secret.txt`"
 exclude_updater="$nextcloudDataDir/updater-*"
 exclude_updater_hidden="$nextcloudDataDir/updater-*/.*"
 exclude_versions_dir="$nextcloudDataDir*/files_versions/*"
+exclude_trash_dir="$nextcloudDataDir*/files_trashbin/*"
 
 webserver_user="www-data"
 webserver_service_name="nginx"
