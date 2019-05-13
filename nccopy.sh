@@ -43,7 +43,7 @@ file_size_in_bytes() {
 
 #----------program------------------
 stage "Checking conditions..."
-#check_root
+check_root
 echo
 
 stage "Preparing..."
