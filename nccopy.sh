@@ -65,7 +65,7 @@ for file in "$BORG_REPO"/data/0/*; do
     fi
     mkdir -p ${target_dir}/data/0 && mv ${file} ${target_dir}/data/0/
     ln -s ${target_dir}/data/0/${fileName} ${file}
-    echo "$file done";
+    info "$file done";
   fi
 done
 
