@@ -12,7 +12,7 @@ stage() {
 }
 
 info() {
-  echo "\t$@";
+  printf "\t$@\n";
 }
 
 append_tab() {
