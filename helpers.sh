@@ -6,6 +6,9 @@ nextcloudDataDir="/var/nc-data"
 db_dump_dir="/home/art/temp"
 db_dump_filename="nextcloud-db.sql"
 
+nextcloudDatabase="nextcloud"
+
+
 #----------helpers------------------
 stage() {
   printf "%s %s\n" "$( date )" "$*" >&1;
@@ -59,9 +62,31 @@ stop_web_server() {
 }
 
 dump_database() {
+  pg_dump ${postgres_address_str}/${nextcloudDatabase} > "${db_dump_dir}/${db_dump_filename}" | append_tab
+}
+
+dump_docker_database() {
   info "Backup Nextcloud database"
   docker exec -t -u postgres postgres pg_dumpall -c > "${db_dump_dir}/${db_dump_filename}" | append_tab
   info "Done\n"
+}
+
+restore_database() {
+   cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | pg_restore ${postgres_address_str}/${nextcloudDatabase}
+}
+
+restore_docker_database() {
+  echo
+  echo "Dropping old and recreating Nextcloud DB..."
+  docker exec -it postgres psql -U postgres -c "DROP DATABASE ${nextcloudDatabase}"
+  docker exec -it postgres psql -U postgres -c "CREATE DATABASE ${nextcloudDatabase}"
+  echo "Done"
+  echo
+
+  echo "Restoring backup DB..."
+  cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | docker exec -i postgres psql -U postgres -d ${nextcloudDatabase}
+  echo "Done"
+  echo
 }
 
 create_main_dump() {

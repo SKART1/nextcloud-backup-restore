@@ -13,7 +13,6 @@ extract_temp_dir="/home/art2/temp"
 webserver_user="www-data"
 webserver_service_name="nginx"
 
-nextcloudDatabase="nextcloud"
 borg_archive=$1
 
 if [ $# -eq 0 ]
@@ -53,17 +52,7 @@ info
 #
 # Restore database
 #
-echo
-echo "Dropping old and recreating Nextcloud DB..."
-docker exec -it postgres psql -U postgres -c "DROP DATABASE ${nextcloudDatabase}"
-docker exec -it postgres psql -U postgres -c "CREATE DATABASE ${nextcloudDatabase}"
-echo "Done"
-echo
 
-echo "Restoring backup DB..."
-cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | docker exec -i postgres psql -U postgres -d ${nextcloudDatabase}
-echo "Done"
-echo
 
 start_web_server
 

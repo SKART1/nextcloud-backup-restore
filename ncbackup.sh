@@ -11,6 +11,7 @@ trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 #----------globals------------------
 export BORG_REPO="/home/art/backup1"
 export BORG_PASSPHRASE="`cat ./secret.txt`"
+postgres_address_str="`cat ./postgress_secret.txt`"
 
 #----------parameters------------------
 exclude_updater="$nextcloudDataDir/updater-*"
