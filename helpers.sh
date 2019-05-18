@@ -62,7 +62,9 @@ stop_web_server() {
 }
 
 dump_database() {
+  info "Backup Nextcloud database"
   pg_dump ${postgres_address_str}/${nextcloudDatabase} > "${db_dump_dir}/${db_dump_filename}" | append_tab
+  info "Done\n"
 }
 
 dump_docker_database() {
@@ -72,7 +74,9 @@ dump_docker_database() {
 }
 
 restore_database() {
-   cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | pg_restore ${postgres_address_str}/${nextcloudDatabase}
+  info "Restoring Nextcloud database"
+  cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | pg_restore ${postgres_address_str}/${nextcloudDatabase}
+  info "Done\n"
 }
 
 restore_docker_database() {
