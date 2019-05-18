@@ -75,7 +75,7 @@ dump_docker_database() {
 
 restore_database() {
   info "Restoring Nextcloud database"
-  cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | pg_restore ${postgres_address_str}/${nextcloudDatabase}
+  cat ${extract_temp_dir}/${db_dump_dir}/${db_dump_filename} | pg_restore --dbname=${postgres_address_str}/${nextcloudDatabase}
   info "Done\n"
 }
 
