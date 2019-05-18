@@ -63,7 +63,7 @@ stop_web_server() {
 
 dump_database() {
   info "Backup Nextcloud database"
-  pg_dump ${postgres_address_str}/${nextcloudDatabase} > "${db_dump_dir}/${db_dump_filename}" | append_tab
+  pg_dump ${postgres_address_str}/${nextcloudDatabase} --clean > "${db_dump_dir}/${db_dump_filename}" | append_tab
   info "Done\n"
 }
 
