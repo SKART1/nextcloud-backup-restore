@@ -5,7 +5,7 @@
 #----------globals------------------
 export BORG_REPO="/home/art2/backup1"
 export BORG_PASSPHRASE="`cat ./secret.txt`"
-
+postgres_address_str="`cat ./postgress_secret.txt`"
 
 #----------parameters------------------
 extract_temp_dir="/home/art2/temp"
