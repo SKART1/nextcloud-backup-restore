@@ -54,8 +54,9 @@ info
 # Restore database
 #
 echo
-echo "Dropping old Nextcloud DB..."
+echo "Dropping old and recreating Nextcloud DB..."
 docker exec -it postgres psql -U postgres -c "DROP DATABASE ${nextcloudDatabase}"
+docker exec -it postgres psql -U postgres -c "CREATE DATABASE ${nextcloudDatabase}"
 echo "Done"
 echo
 
