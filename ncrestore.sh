@@ -52,9 +52,7 @@ info
 #
 # Restore database
 #
-
-
-start_web_server
+restore_database
 
 #
 # Set directory permissions
@@ -64,6 +62,8 @@ chown -R "${webserver_user}":"${webserver_user}" "${nextcloudFileDir}"
 chown -R "${webserver_user}":"${webserver_user}" "${nextcloudDataDir}"
 echo "Done"
 echo
+
+start_web_server
 
 #
 # Update the system data-fingerprint (see https://docs.nextcloud.com/server/12/admin_manual/configuration_server/occ_command.html#maintenance-commands-label)
