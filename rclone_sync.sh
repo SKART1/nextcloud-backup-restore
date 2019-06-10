@@ -1,6 +1,8 @@
 #!/bin/bash
 
 . ./helpers.sh
+
+info "Backuping to  onedrive"
 /home/borg/rclone-folder/rclone sync --copy-links /backup/borg/data/ onedrive1:mother
 RESULT1=$?
 if [ ${RESULT1} -ne 0 ]; then
@@ -27,3 +29,5 @@ fi
 
 res=$(( RESULT1 + RESULT2 + RESULT3 + RESULT4))
 exit $res
+
+info "Done\n"

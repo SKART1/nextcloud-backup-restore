@@ -5,6 +5,7 @@
 target_directories=('/backup/WebDav/Acc1' '/backup/WebDav/Acc2' '/backup/WebDav/Acc3' '/backup/WebDav/Acc4' '/backup/WebDav/Acc5' '/backup/WebDav/Acc6' '/backup/WebDav/Acc7' '/backup/WebDav/Acc8' '/backup/WebDav/Acc9');
 file='health.txt'
 
+info "Checking mount points"
 for idx in "${!target_directories[@]}"; do
   check_dir ${target_directories[idx]}/${file}
 
@@ -16,5 +17,6 @@ for idx in "${!target_directories[@]}"; do
      info "Done\n"
   fi
 done
+info "Done\n"
 
 
