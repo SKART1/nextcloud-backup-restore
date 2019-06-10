@@ -9,11 +9,9 @@ for idx in "${!target_directories[@]}"; do
   check_dir ${target_directories[idx]}/${file}
 
   RESULT=$?
-  if [ $RESULT -eq 0 ]; then
-    echo success
-  else
-    umount ${target_directories[idx]}
-    mount ${target_directories[idx]}
+  if [ $RESULT -ne 0 ]; then
+     umount ${target_directories[idx]}
+     mount ${target_directories[idx]}
   fi
 done
 
