@@ -153,5 +153,5 @@ pruning_repository() {
 }
 
 check_dir() {
-  $(cat $1) >/dev/null 2>&1
+  cat $1 >/dev/null 2>&1
 }
