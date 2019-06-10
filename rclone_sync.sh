@@ -25,4 +25,5 @@ if [ ${RESULT4} -ne 0 ]; then
   error_echo "Error copying to onedrive4"
 fi
 
-exit $RESULT1 || $RESULT2 || $RESULT3 || $RESULT4
+res=$(( RESULT1 + RESULT2 + RESULT3 + RESULT4))
+exit $res
