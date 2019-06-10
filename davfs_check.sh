@@ -12,7 +12,8 @@ for idx in "${!target_directories[@]}"; do
   if [ $RESULT -eq 0 ]; then
     echo success
   else
-    echo failed
+    umount ${target_directories[idx]}
+    mount ${target_directories[idx]}
   fi
 done
 
