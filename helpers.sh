@@ -151,3 +151,7 @@ pruning_repository() {
   info "Done\n"
   return ${res}
 }
+
+check_dir() {
+  $(cat $1) >/dev/null 2>&1
+}
