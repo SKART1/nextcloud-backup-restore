@@ -9,9 +9,11 @@ for idx in "${!target_directories[@]}"; do
   check_dir ${target_directories[idx]}/${file}
 
   RESULT=$?
-  if [ $RESULT -ne 0 ]; then
+  if [ ${RESULT} -ne 0 ]; then
+     info "Mount point ${target_directories[idx]} is broken. Remounting"
      umount ${target_directories[idx]}
      mount ${target_directories[idx]}
+     info "Done\n"
   fi
 done
 
