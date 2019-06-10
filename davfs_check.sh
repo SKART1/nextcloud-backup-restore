@@ -11,8 +11,8 @@ for idx in "${!target_directories[@]}"; do
   RESULT=$?
   if [ ${RESULT} -ne 0 ]; then
      info "Mount point ${target_directories[idx]} is broken. Remounting"
-     umount ${target_directories[idx]}
-     mount ${target_directories[idx]}
+     sudo umount ${target_directories[idx]}
+     sudo mount ${target_directories[idx]}
      info "Done\n"
   fi
 done
